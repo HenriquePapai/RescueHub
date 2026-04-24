@@ -1,7 +1,17 @@
-FROM hrchlhck/actions-runner
+FROM python:3.12-slim
 
-USER root
+WORKDIR /app
 
-RUN APT update && apt install nikto -t
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-USER devsecops
+COPY requirements.txt .
+
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["python", "app/manage.py", "runserver", "0.0.0.0:8000"]
