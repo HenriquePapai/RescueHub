@@ -5,12 +5,15 @@ O RescueHub é uma plataforma web para a gestão de abrigos de animais, projetad
 
 # Instalação e Execução
 ## 1. Clonar o repositório:
+```bash
 git clone https://github.com/HenriquePapai/RescueHub
-
+```
 ## 2. Subir os serviços:
 ```bash
 docker-compose up --build
+```
+```bash
 docker-compose exec web python manage.py migrate
 ```
 ## 3. Acessar o serviço:
-http://127.0.0.1:8000/
+[Acessar aplicação](http://127.0.0.1:8000/)
