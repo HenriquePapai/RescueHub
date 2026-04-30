@@ -1,0 +1,40 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rescuehub-web
+    container_name: rescuehub_web
+    command: python app/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=dev-secret-key
+      - DATABASE_NAME=rescuehub
+      - DATABASE_USER=rescuehub
+      - DATABASE_PASSWORD=rescuehub
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+    depends_on:
+      - db
+
+  db:
+    build:
+      context: ./docker/db
+      dockerfile: Dockerfile
+    image: rescuehub-db
+    container_name: rescuehub_db
+    environment:
+      - POSTGRES_DB=rescuehub
+      - POSTGRES_USER=rescuehub
+      - POSTGRES_PASSWORD=rescuehub
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
