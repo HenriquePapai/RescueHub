@@ -1,0 +1,19 @@
+name: "Formativa"
+
+on:
+  - push
+  - workflow_dispatch
+
+jobs:
+  tarefa:
+    name: Olá, mundo!
+    runs-on: self-hosted
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+      - name: Echo
+        run: echo "Olá, mundo!"
+      - name: Nikto
+        run: nikto -host http://rescuehub_web:8000
+      - name: Bandit
+        run: bandit -r .
