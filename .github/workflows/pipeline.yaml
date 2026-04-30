@@ -11,3 +11,36 @@ jobs:
     steps:
       - name: Echo
         run: echo "Olá, mundo!"
+
+  testes:
+    name: Testes Unitários — RF01, RF02, RF03
+    runs-on: self-hosted
+    needs: tarefa
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      - name: Instalar dependências
+        run: pip install django==5.1.7 djangorestframework==3.15.2 psycopg2-binary==2.9.10 pillow
+
+      - name: Criar migrações
+        run: |
+          cd app
+          python manage.py makemigrations core
+        env:
+          DATABASE_NAME: rescuehub
+          DATABASE_USER: rescuehub
+          DATABASE_PASSWORD: rescuehub
+          DATABASE_HOST: localhost
+          DATABASE_PORT: "5432"
+
+      - name: Executar testes — RF01, RF02, RF03
+        run: |
+          cd app
+          python manage.py test core --verbosity=2
+        env:
+          DATABASE_NAME: rescuehub
+          DATABASE_USER: rescuehub
+          DATABASE_PASSWORD: rescuehub
+          DATABASE_HOST: localhost
+          DATABASE_PORT: "5432"
