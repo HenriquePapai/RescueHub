@@ -1,0 +1,37 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}RescueHub{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="container topbar-content">
+            <h1 class="logo">RescueHub</h1>
+
+            <nav class="nav">
+                <a href="/">Início</a>
+                <a href="#">Animais</a>
+                <a href="#">Adoções</a>
+                <a href="#">Abrigos</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>RescueHub - Sistema de gestão de abrigos e adoções</p>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
