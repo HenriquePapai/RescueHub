@@ -2,6 +2,6 @@ FROM hrchlhck/actions-runner
 
 USER root
 
-RUN APT update && apt install nikto -t
+RUN apt update && apt install -y nikto python3-pip && pip3 install bandit
 
 USER devsecops
