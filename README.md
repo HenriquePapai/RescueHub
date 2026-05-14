@@ -19,3 +19,7 @@ docker-compose exec web python manage.py migrate
 ```bash
 http://127.0.0.1:8000/
 ```
+## 4. Para criar um super usuário:
+```
+docker exec -it rescuehub_web python app/manage.py createsuperuser
+```
