@@ -1,0 +1,38 @@
+.filter-bar {
+  background: #fff;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  background: var(--card-bg);
+  transition: transform .2s, box-shadow .2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.1);
+}
+
+.animal-card .card-img-top {
+  height: 200px;
+  object-fit: cover;
+  border-radius: 16px 16px 0 0;
+}
+
+.badge {
+  border-radius: 20px;
+  font-weight: 700;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+}
+
+.badge-disponivel {
+  background: #d4edda;
+  color: #155724;
+}

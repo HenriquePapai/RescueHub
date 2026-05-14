@@ -1,0 +1,27 @@
+.auth-wrapper {
+  min-height: calc(100vh - 62px);
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+}
+
+.auth-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 2.5rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0,0,0,.05);
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.form-control {
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  padding: 0.6rem 1rem;
+}
+
+.form-label {
+  font-weight: 700;
+}

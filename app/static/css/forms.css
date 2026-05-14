@@ -1,0 +1,22 @@
+.table-custom {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.table-custom thead th {
+  background: var(--primary-dark);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.9rem 1rem;
+}
+
+.table-custom tbody tr:hover {
+  background: #f0f7f4;
+}
+
+.table-custom tbody td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}

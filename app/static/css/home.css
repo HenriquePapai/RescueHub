@@ -1,0 +1,25 @@
+body {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.hero {
+  background: none;
+  color: var(--text);
+  padding: 3rem 0 2rem;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+}
+
+.hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  max-width: 540px;
+  margin: 0 auto 2rem;
+  color: var(--text-muted);
+}
