@@ -20,3 +20,34 @@
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
+
+.button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.6rem 1.4rem;
+  transition: background .2s;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--primary-dark);
+}
+
+.btn-cancel {
+  border: 1px solid #6c757d;
+  color: #6c757d;
+  background: transparent;
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.6rem 1.4rem;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-cancel:hover {
+  background: #6c757d;
+  color: #fff;
+}

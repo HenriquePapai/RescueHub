@@ -25,3 +25,19 @@
 .form-label {
   font-weight: 700;
 }
+
+.button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.6rem 1rem;
+  width: 100%;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.button:hover {
+  background: var(--primary-dark);
+}

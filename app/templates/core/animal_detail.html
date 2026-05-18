@@ -4,17 +4,17 @@
 {% block extra_css %}<link href="{% static 'css/animal_detail.css' %}" rel="stylesheet">{% endblock %}
 {% block content %}
 <div class="container py-4">
-  <a href="/catalogo/" class="btn btn-outline-custom btn-sm mb-4"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+  <a href="/catalogo/" class="btn btn-outline-custom btn-sm mb-4">Voltar</a>
   
   <div class="row g-4">
     <div class="col-md-5">
       {% if animal.photo %}
-      <img src="{{ animal.photo.url }}" class="img-fluid rounded-4 shadow w-100" style="max-height:360px;object-fit:cover;" alt="{{ animal.name }}">
+      <img src="{{ animal.photo.url }}" class="animal-image" alt="{{ animal.name }}">
       {% else %}
-      <div class="rounded-4 d-flex align-items-center justify-content-center" style="height:320px;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);font-size:6rem;">{% if animal.species == 'cao' %}🐶{% else %}🐱{% endif %}</div>
+      <div class="no-photo-empty"></div>
       {% endif %}
       {% if can_manage %}
-      <a href="/animais/{{ animal.pk }}/editar/" class="btn btn-outline-custom btn-sm w-100 mt-3"><i class="bi bi-pencil me-1"></i>Editar Animal</a>
+      <a href="/animais/{{ animal.pk }}/editar/" class="btn btn-outline-custom btn-sm w-100 mt-3">Editar Animal</a>
       {% endif %}
     </div>
 
@@ -36,13 +36,13 @@
       {% if animal.health_history and can_manage %}
 
       <div class="info-card mb-3">
-        <div class="fw-bold mb-1"><i class="bi bi-heart-pulse me-1"></i>Histórico de Saúde</div>
+        <div class="fw-bold mb-1">Histórico de Saúde</div>
         <p class="mb-0 small">{{ animal.health_history }}</p>
       </div>
 
       {% endif %}
       {% if user.is_authenticated and user.is_adotante and animal.status == 'disponivel' %}
-      <a href="/adocoes/animal/{{ animal.pk }}/" class="btn btn-accent mt-3"><i class="bi bi-heart me-1"></i>Quero Adotar</a>
+      <a href="/adocoes/animal/{{ animal.pk }}/" class="btn btn-accent mt-3">Quero Adotar</a>
       {% endif %}
 
     </div>

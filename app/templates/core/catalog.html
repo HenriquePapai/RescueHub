@@ -5,9 +5,6 @@
 <div class="page-header">
   <div class="container d-flex justify-content-between align-items-center">
     <h4>Catálogo de Animais</h4>
-    {% if user.is_authenticated and user.role in 'voluntario,admin' or user.is_superuser %}
-    <a href="/animais/novo/" class="btn btn-primary-custom">Cadastrar Animal</a>
-    {% endif %}
   </div>
 </div>
 <div class="container">
@@ -54,7 +51,7 @@
 
       <div class="col-12 col-md-4 d-flex gap-2">
         <button class="btn btn-primary-custom btn-sm w-100">Filtrar</button>
-        <a href="/catalogo/" class="btn btn-outline-secondary btn-sm" style="border-radius:10px;">Limpar</a>
+        <a href="/catalogo/" class="btn-clean">Limpar</a>
       </div>
       
     </div>
@@ -62,7 +59,7 @@
   <div class="row g-4">
     {% for animal in animals %}
     <div class="col-sm-6 col-md-4 col-lg-3">
-      <div class="card animal-card h-100">
+      <div class="card animal-card h-100 position-relative">
         {% if animal.photo %}
         <img src="{{ animal.photo.url }}" class="card-img-top" alt="{{ animal.name }}">
         {% else %}
@@ -71,11 +68,10 @@
         <div class="card-body d-flex flex-column">
           <div class="d-flex justify-content-between align-items-start mb-1">
             <span class="fw-800">{{ animal.name }}</span>
-            <span class="badge badge-{{ animal.status }}">{{ animal.get_status_display }}</span>
           </div>
           <div class="small text-muted mb-2">{{ animal.get_species_display }} • {{ animal.get_sex_display }} • {{ animal.get_size_display }} • {{ animal.age }} ano{{ animal.age|pluralize }}</div>
           <p class="small text-muted flex-grow-1">{{ animal.description|truncatechars:80 }}</p>
-          <a href="/animais/{{ animal.pk }}/" class="btn btn-outline-custom btn-sm mt-2">Ver detalhes</a>
+          <a href="/animais/{{ animal.pk }}/" class="btn btn-outline-custom btn-sm mt-2 stretched-link">Ver detalhes</a>
         </div>
       </div>
     </div>
