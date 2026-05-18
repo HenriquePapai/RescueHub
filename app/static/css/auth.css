@@ -16,14 +16,20 @@
   margin: 0 auto;
 }
 
-.form-control {
+.campo-entrada {
+  width: 100%;
   border-radius: 10px;
   border: 1.5px solid var(--border);
   padding: 0.6rem 1rem;
+  font-family: inherit;
+  font-size: 1rem;
+  box-sizing: border-box;
 }
 
-.form-label {
+.rotulo-campo {
   font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: inline-block;
 }
 
 .button {
@@ -36,8 +42,112 @@
   width: 100%;
   cursor: pointer;
   transition: background .2s;
+  font-size: 1rem;
 }
 
 .button:hover {
   background: var(--primary-dark);
+}
+
+.fundo-autenticacao {
+  min-height: calc(100vh - 62px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  padding: 2rem 0.75rem;
+}
+
+.conteudo-autenticacao {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.bloco-titulo-centralizado {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.titulo-autenticacao {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+.caixa-mensagem-erro {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.bloco-linha-campo {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.bloco-linha-campo-larga {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.texto-suporte-campo {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.texto-rodape-links {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+}
+
+.link-destaque-formulario {
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.fundo-registro {
+  min-height: calc(100vh - 62px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  padding: 2rem 0.75rem;
+}
+
+.linha-registro {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.coluna-registro {
+  width: 100%;
+  max-width: 460px;
+}
+
+.bloco-campos-registro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.campo-registro-medio {
+  flex: 1 1 calc(50% - 0.5rem);
+  min-width: 180px;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
 }

@@ -2,50 +2,50 @@
 {% load static %}
 {% block extra_css %}<link href="{% static 'css/auth.css' %}" rel="stylesheet">{% endblock %}
 {% block content %}
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card p-4 p-md-5">
-        <div class="text-center mb-4">
-          <h4 class="fw-800 mt-2">Criar Conta</h4>
+<div class="fundo-registro">
+  <div class="linha-registro">
+    <div class="coluna-registro">
+      <div class="auth-card">
+        <div class="bloco-titulo-centralizado">
+          <h4 class="titulo-autenticacao">Criar Conta</h4>
         </div>
         {% for message in messages %}
-        <div class="alert alert-danger">{{ message }}</div>
+        <div class="caixa-mensagem-erro">{{ message }}</div>
         {% endfor %}
         <form method="post">
           {% csrf_token %}
-          <div class="row">
+          <div class="bloco-campos-registro">
 
-            <div class="col-md-6 mb-3">
-              <label class="form-label">Nome</label>
-              <input name="first_name" class="form-control" required>
+            <div class="campo-registro-medio">
+              <label class="rotulo-campo">Nome</label>
+              <input name="first_name" class="campo-entrada" required>
             </div>
 
-            <div class="col-md-6 mb-3">
-              <label class="form-label">Sobrenome</label>
-              <input name="last_name" class="form-control">
+            <div class="campo-registro-medio">
+              <label class="rotulo-campo">Sobrenome</label>
+              <input name="last_name" class="campo-entrada">
             </div>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label">Nome de usuário</label>
-            <input name="username" class="form-control" required>
+          <div class="bloco-linha-campo">
+            <label class="rotulo-campo">Nome de usuário</label>
+            <input name="username" class="campo-entrada" required>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label">E-mail</label>
-            <input name="email" type="email" class="form-control">
+          <div class="bloco-linha-campo">
+            <label class="rotulo-campo">E-mail</label>
+            <input name="email" type="email" class="campo-entrada">
           </div>
 
-          <div class="mb-4">
-            <label class="form-label">Senha</label>
-            <input name="password" type="password" class="form-control" required>
-            <div class="form-text">Mínimo 12 caracteres.</div>
+          <div class="bloco-linha-campo-larga">
+            <label class="rotulo-campo">Senha</label>
+            <input name="password" type="password" class="campo-entrada" required>
+            <div class="texto-suporte-campo">Mínimo 12 caracteres.</div>
           </div>
           
           <button class="button">Criar Conta</button>
         </form>
-        <p class="text-center text-muted small mt-4 mb-0">Já tem conta? <a href="/login/" class="fw-bold" style="color:var(--primary)">Entrar</a></p>
+        <p class="texto-rodape-links">Já tem conta? <a href="/login/" class="link-destaque-formulario">Entrar</a></p>
       </div>
     </div>
   </div>

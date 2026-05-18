@@ -2,31 +2,31 @@
 {% load static %}
 {% block extra_css %}<link href="{% static 'css/auth.css' %}" rel="stylesheet">{% endblock %}
 {% block content %}
-<div class="auth-wrapper">
-  <div class="container">
+<div class="fundo-autenticacao">
+  <div class="conteudo-autenticacao">
     <div class="auth-card mx-auto">
 
-      <div class="text-center mb-4">
-        <h4 class="fw-800 mt-2">Login</h4>
+      <div class="bloco-titulo-centralizado">
+        <h4 class="titulo-autenticacao">Login</h4>
       </div>
       
-      {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+      {% if error %}<div class="caixa-mensagem-erro">{{ error }}</div>{% endif %}
       <form method="post">
         {% csrf_token %}
 
-        <div class="mb-3">
-          <label class="form-label">Nome de usuário</label>
-          <input name="username" class="form-control" required autofocus>
+        <div class="bloco-linha-campo">
+          <label class="rotulo-campo">Nome de usuário</label>
+          <input name="username" class="campo-entrada" required autofocus>
         </div>
 
-        <div class="mb-4">
-          <label class="form-label">Senha</label>
-          <input name="password" type="password" class="form-control" required>
+        <div class="bloco-linha-campo-larga">
+          <label class="rotulo-campo">Senha</label>
+          <input name="password" type="password" class="campo-entrada" required>
         </div>
 
         <button class="button">Entrar</button>
       </form>
-      <p class="text-center text-muted small mt-4 mb-0">Não tem conta? <a href="/register/" class="fw-bold" style="color:var(--primary)">Cadastre-se</a></p>
+      <p class="texto-rodape-links">Não tem conta? <a href="/register/" class="link-destaque-formulario">Cadastre-se</a></p>
     </div>
   </div>
 </div>
