@@ -48,7 +48,7 @@
                 <option value="adotado" {% if animal.status == 'adotado' %}selected{% endif %}>Adotado</option>
               </select>
             </div>
-            <div class="col-12 mb-3"><label class="form-label">Temperamento</label><input name="temperament" class="form-control" value="{{ animal.temperament|default:'' }}" placeholder="Ex: dócil, brincalhão, tímido"></div>
+            <div class="col-12 mb-3"><label class="form-label">Temperamento</label><input name="temperament" class="form-control" value="{{ animal.temperament|default:'' }}"></div>
             <div class="col-12 mb-3"><label class="form-label">Descrição</label><textarea name="description" class="form-control" rows="3" required>{{ animal.description|default:'' }}</textarea></div>
             <div class="col-12 mb-3"><label class="form-label">Histórico de Saúde</label><textarea name="health_history" class="form-control" rows="3">{{ animal.health_history|default:'' }}</textarea></div>
             <div class="col-12 mb-3"><label class="form-label">Foto</label><input name="photo" type="file" class="form-control" accept="image/*"></div>
