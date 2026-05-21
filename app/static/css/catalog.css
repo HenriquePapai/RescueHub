@@ -57,30 +57,25 @@
   color: #fff;
 }
 
-.bloco-principal-catalogo {
+.box-catalogo {
   width: 100%;
   max-width: 1320px;
   margin: 0 auto;
   padding: 2.5rem 0.75rem 1.5rem 0.75rem;
 }
 
-.grade-filtros-catalogo {
+.filtros-catalogo {
   display: flex;
   flex-wrap: wrap;
-  margin-top: calc(-1 * 0.5rem);
-  margin-right: calc(-.5 * 0.5rem);
-  margin-left: calc(-.5 * 0.5rem);
+  gap: 1rem;
   align-items: flex-end;
 }
 
-.caixa-filtro {
-  flex: 0 0 auto;
-  width: 50%;
-  padding-right: calc(0.5rem * .5);
-  padding-left: calc(0.5rem * .5);
-  margin-top: 0.5rem;
+.box-filtro {
+  flex: 1 1 180px;
+  display: flex;
+  flex-direction: column;
 }
-@media (min-width: 768px) { .caixa-filtro { width: 16.66666667%; } }
 
 .rotulo-filtro {
   display: inline-block;
@@ -89,7 +84,7 @@
   margin-bottom: 0.5rem;
 }
 
-.campo-selecao-custom {
+.campo-selecao {
   display: block;
   width: 100%;
   padding: 0.35rem 0.5rem;
@@ -102,16 +97,11 @@
   border-radius: 0.25rem;
 }
 
-.caixa-botoes-acao {
-  flex: 0 0 auto;
-  width: 100%;
-  padding-right: calc(0.5rem * .5);
-  padding-left: calc(0.5rem * .5);
-  margin-top: 0.5rem;
+.caixa-botoes {
+  flex: 1 2 auto;
   display: flex;
   gap: 0.5rem;
 }
-@media (min-width: 768px) { .caixa-botoes-acao { width: 33.33333333%; } }
 
 .botao-filtrar-submeter {
   display: inline-block;
@@ -131,25 +121,25 @@
   background-color: var(--primary-dark);
 }
 
-.grade-layouts-cartoes {
+.layouts-cartoes {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
 }
 
-.coluna-individual-cartao {
+.coluna-cartao {
   flex: 1 1 260px;
   max-width: 320px;
 }
 
-.corpo-cartao-animal {
+.info-card {
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 }
 
-.alinhamento-titulo-cartao {
+.alinhamento-card {
   display: flex;
   justify-content: space-between;
   align-items: start;
@@ -161,13 +151,13 @@
   font-size: 1.1rem;
 }
 
-.texto-caracteristicas-mutado {
+.card-caracteristicas {
   font-size: 0.875rem;
   color: var(--text-muted);
   margin-bottom: 0.5rem;
 }
 
-.resumo-descricao-animal {
+.descricao-animal {
   font-size: 0.875rem;
   color: var(--text-muted);
   flex-grow: 1;
@@ -201,7 +191,7 @@
   color: #fff;
 }
 
-.coluna-vazia-estado {
+.coluna-estado {
   flex: 1 1 100%;
 }
 
@@ -210,7 +200,7 @@
   padding: 3rem 1rem;
 }
 
-.titulo-aviso-vazio {
+.aviso-animal {
   font-size: 1.25rem;
   font-weight: bold;
   margin-bottom: 1rem;

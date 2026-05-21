@@ -14,14 +14,14 @@
     <a class="logo-site" href="/">RescueHub</a>
     
     <div class="menu-links">
-      <ul class="lista-links-esquerda">
+      <ul class="link-catalogo">
         <li><a class="link-item" href="/catalogo/">Catálogo</a></li>
         {% if user.is_authenticated and user.role == 'voluntario' or user.is_authenticated and user.role == 'admin' or user.is_superuser %}
         <li><a class="link-item" href="/animais/novo/">Cadastrar Animal</a></li>
         {% endif %}
       </ul>
 
-      <ul class="lista-links-direita">
+      <ul class="link-autenticacoes">
         {% if user.is_authenticated %}
         <li class="item-usuario-logado">
           <span class="nome-usuario">{{ user.get_full_name|default:user.username }}</span>
@@ -38,9 +38,9 @@
 </nav>
 
 {% if messages %}
-<div class="bloco-alertas">
+<div class="alertas">
   {% for message in messages %}
-  <div class="caixa-alerta alerta-{{ message.tags }}">
+  <div class="box-alerta alerta-{{ message.tags }}">
     {{ message }}
   </div>
   {% endfor %}

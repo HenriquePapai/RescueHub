@@ -44,7 +44,7 @@
   display: block;
 }
 
-.bloco-principal-detalhes {
+.box-principal {
   width: 100%;
   max-width: 1320px;
   margin: 0 auto;
@@ -72,13 +72,13 @@
   color: #fff;
 }
 
-.grade-detalhes {
+.conteudo {
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
 }
 
-.coluna-esquerda-midia {
+.informacoes-foto {
   flex: 1 1 340px;
 }
 
@@ -104,7 +104,7 @@
   color: #fff;
 }
 
-.coluna-direita-dados {
+.informacoes {
   flex: 1.5 1 420px;
 }
 
@@ -115,7 +115,7 @@
   margin-bottom: 1rem;
 }
 
-.etiqueta-status {
+.status {
   display: inline-block;
   border-radius: 20px;
   font-weight: 700;

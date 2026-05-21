@@ -9,7 +9,6 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ['role', 'is_active']
     fieldsets = UserAdmin.fieldsets + (('Perfil', {'fields': ('role', 'phone')}),)
 
-
 @admin.register(Animal)
 class AnimalAdmin(admin.ModelAdmin):
     list_display = ['name', 'species', 'sex', 'age', 'size', 'status']

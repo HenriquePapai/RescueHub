@@ -1,32 +1,32 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block extra_css %}<link href="{% static 'css/auth.css' %}" rel="stylesheet">{% endblock %}
+{% block extra_css %}<link href="{% static 'css/login.css' %}" rel="stylesheet">{% endblock %}
 {% block content %}
 <div class="fundo-autenticacao">
   <div class="conteudo-autenticacao">
-    <div class="auth-card mx-auto">
+    <div class="auth-card">
 
-      <div class="bloco-titulo-centralizado">
+      <div class="bloco-titulo">
         <h4 class="titulo-autenticacao">Login</h4>
       </div>
       
-      {% if error %}<div class="caixa-mensagem-erro">{{ error }}</div>{% endif %}
+      {% if error %}<div class="mensagem-erro">{{ error }}</div>{% endif %}
       <form method="post">
         {% csrf_token %}
 
-        <div class="bloco-linha-campo">
+        <div class="usuario">
           <label class="rotulo-campo">Nome de usuário</label>
           <input name="username" class="campo-entrada" required autofocus>
         </div>
 
-        <div class="bloco-linha-campo-larga">
+        <div class="senha">
           <label class="rotulo-campo">Senha</label>
           <input name="password" type="password" class="campo-entrada" required>
         </div>
 
         <button class="button">Entrar</button>
       </form>
-      <p class="texto-rodape-links">Não tem conta? <a href="/register/" class="link-destaque-formulario">Cadastre-se</a></p>
+      <p class="rodape">Não tem conta? <a href="/register/" class="link-formulario">Cadastre-se</a></p>
     </div>
   </div>
 </div>

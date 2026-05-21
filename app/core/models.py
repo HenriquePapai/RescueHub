@@ -27,7 +27,6 @@ class User(AbstractUser):
         verbose_name = 'Usuário'
         verbose_name_plural = 'Usuários'
 
-
 class Animal(models.Model):
     SPECIES = [('cao', 'Cão'), ('gato', 'Gato')]
     SEX = [('macho', 'Macho'), ('femea', 'Fêmea')]

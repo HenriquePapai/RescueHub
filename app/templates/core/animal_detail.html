@@ -3,11 +3,11 @@
 {% block title %}{{ animal.name }} — RescueHub{% endblock %}
 {% block extra_css %}<link href="{% static 'css/animal_detail.css' %}" rel="stylesheet">{% endblock %}
 {% block content %}
-<div class="bloco-principal-detalhes">
+<div class="box-principal">
   <a href="/catalogo/" class="botao-voltar">Voltar</a>
   
-  <div class="grade-detalhes">
-    <div class="coluna-esquerda-midia">
+  <div class="conteudo">
+    <div class="informacoes-foto">
       {% if animal.photo %}
       <img src="{{ animal.photo.url }}" class="animal-image" alt="{{ animal.name }}">
       {% else %}
@@ -18,10 +18,10 @@
       {% endif %}
     </div>
 
-    <div class="coluna-direita-dados">
+    <div class="informacoes">
       <div class="cabecalho-animal">
         <h2>{{ animal.name }}</h2>
-        <span class="etiqueta-status status-{{ animal.status }}">{{ animal.get_status_display }}</span>
+        <span class="status status-{{ animal.status }}">{{ animal.get_status_display }}</span>
       </div>
 
       <table class="tabela-caracteristicas">

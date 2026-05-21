@@ -1,51 +1,52 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block extra_css %}<link href="{% static 'css/auth.css' %}" rel="stylesheet">{% endblock %}
+{% block extra_css %}<link href="{% static 'css/register.css' %}" rel="stylesheet">{% endblock %}
 {% block content %}
 <div class="fundo-registro">
   <div class="linha-registro">
     <div class="coluna-registro">
       <div class="auth-card">
-        <div class="bloco-titulo-centralizado">
+        <div class="bloco-titulo">
           <h4 class="titulo-autenticacao">Criar Conta</h4>
         </div>
-        {% for message in messages %}
-        <div class="caixa-mensagem-erro">{{ message }}</div>
-        {% endfor %}
+
+        {% if error %}
+        <div class="mensagem-erro">{{ error }}</div>
+        {% endif %}
+
         <form method="post">
           {% csrf_token %}
           <div class="bloco-campos-registro">
 
-            <div class="campo-registro-medio">
+            <div class="nome-sobrenome">
               <label class="rotulo-campo">Nome</label>
               <input name="first_name" class="campo-entrada" required>
             </div>
 
-            <div class="campo-registro-medio">
+            <div class="nome-sobrenome">
               <label class="rotulo-campo">Sobrenome</label>
               <input name="last_name" class="campo-entrada">
             </div>
           </div>
 
-          <div class="bloco-linha-campo">
+          <div class="usuario">
             <label class="rotulo-campo">Nome de usuário</label>
             <input name="username" class="campo-entrada" required>
           </div>
 
-          <div class="bloco-linha-campo">
+          <div class="usuario">
             <label class="rotulo-campo">E-mail</label>
             <input name="email" type="email" class="campo-entrada">
           </div>
 
-          <div class="bloco-linha-campo-larga">
+          <div class="senha">
             <label class="rotulo-campo">Senha</label>
             <input name="password" type="password" class="campo-entrada" required>
-            <div class="texto-suporte-campo">Mínimo 12 caracteres.</div>
           </div>
           
           <button class="button">Criar Conta</button>
         </form>
-        <p class="texto-rodape-links">Já tem conta? <a href="/login/" class="link-destaque-formulario">Entrar</a></p>
+        <p class="rodape">Já tem conta? <a href="/login/" class="link-formulario">Entrar</a></p>
       </div>
     </div>
   </div>

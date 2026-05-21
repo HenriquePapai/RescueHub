@@ -2,16 +2,16 @@
 {% load static %}
 {% block extra_css %}<link href="{% static 'css/forms.css' %}" rel="stylesheet">{% endblock %}
 {% block content %}
-<div class="bloco-principal-formulario">
+<div class="box-formulario">
   <div class="linha-centralizada">
-    <div class="coluna-conteudo-formulario">
+    <div class="conteudo-formulario">
       <div class="cartao-formulario">
-        <h5 class="titulo-principal-form">{{ title }}</h5>
+        <h5 class="titulo-principal">{{ title }}</h5>
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="grade-campos">
-            <div class="bloco-campo-medio"><label class="rotulo-campo">Nome</label><input name="name" class="campo-entrada" value="{{ animal.name|default:'' }}" required></div>
-            <div class="bloco-campo-medio">
+            <div class="campos-menores"><label class="rotulo-campo">Nome</label><input name="name" class="campo-entrada" value="{{ animal.name|default:'' }}" required></div>
+            <div class="campos-menores">
               <label class="rotulo-campo">Espécie</label>
               <select name="species" class="campo-entrada" required>
                 <option value="cao" {% if animal.species == 'cao' %}selected{% endif %}>Cão</option>
@@ -19,7 +19,7 @@
               </select>
             </div>
 
-            <div class="bloco-campo-medio">
+            <div class="campos-menores">
               <label class="rotulo-campo">Sexo</label>
               <select name="sex" class="campo-entrada" required>
                 <option value="macho" {% if animal.sex == 'macho' %}selected{% endif %}>Macho</option>
@@ -27,12 +27,12 @@
               </select>
             </div>
 
-            <div class="bloco-campo-medio">
+            <div class="campos-menores">
               <label class="rotulo-campo">Idade</label>
               <input name="age" type="number" class="campo-entrada" value="{{ animal.age|default:'' }}" required>
             </div>
 
-            <div class="bloco-campo-medio">
+            <div class="campos-menores">
               <label class="rotulo-campo">Porte</label>
               <select name="size" class="campo-entrada" required>
                 <option value="pequeno" {% if animal.size == 'pequeno' %}selected{% endif %}>Pequeno</option>
@@ -40,7 +40,7 @@
                 <option value="grande" {% if animal.size == 'grande' %}selected{% endif %}>Grande</option>
               </select>
             </div>
-            <div class="bloco-campo-medio">
+            <div class="campos-menores">
               <label class="rotulo-campo">Status</label>
               <select name="status" class="campo-entrada">
                 <option value="disponivel" {% if animal.status == 'disponivel' %}selected{% endif %}>Disponível</option>
@@ -48,10 +48,10 @@
                 <option value="adotado" {% if animal.status == 'adotado' %}selected{% endif %}>Adotado</option>
               </select>
             </div>
-            <div class="bloco-campo-inteiro"><label class="rotulo-campo">Temperamento</label><input name="temperament" class="campo-entrada" value="{{ animal.temperament|default:'' }}"></div>
-            <div class="bloco-campo-inteiro"><label class="rotulo-campo">Descrição</label><textarea name="description" class="campo-entrada" rows="3" required>{{ animal.description|default:'' }}</textarea></div>
-            <div class="bloco-campo-inteiro"><label class="rotulo-campo">Histórico de Saúde</label><textarea name="health_history" class="campo-entrada" rows="3">{{ animal.health_history|default:'' }}</textarea></div>
-            <div class="bloco-campo-inteiro"><label class="rotulo-campo">Foto</label><input name="photo" type="file" class="campo-entrada" accept="image/*"></div>
+            <div class="campos-menores"><label class="rotulo-campo">Temperamento</label><input name="temperament" class="campo-entrada" value="{{ animal.temperament|default:'' }}"></div>
+            <div class="campos-menores"><label class="rotulo-campo">Descrição</label><textarea name="description" class="campo-entrada" rows="3" required>{{ animal.description|default:'' }}</textarea></div>
+            <div class="campos-menores"><label class="rotulo-campo">Histórico de Saúde</label><textarea name="health_history" class="campo-entrada" rows="3">{{ animal.health_history|default:'' }}</textarea></div>
+            <div class="campos-menores"><label class="rotulo-campo">Foto</label><input name="photo" type="file" class="campo-entrada" accept="image/*"></div>
           </div>
           <div class="container-acoes-botoes">
             <button class="button">Salvar</button>

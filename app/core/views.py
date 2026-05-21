@@ -3,6 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import User, Animal
+import re
 
 
 # Autenticacao
@@ -19,38 +20,59 @@ def login_view(request):
         error = 'Usuário ou senha incorretos.'
     return render(request, 'core/login.html', {'error': error})
 
-
 def logout_view(request):
     logout(request)
     return redirect('login')
 
-
 def register_view(request):
     if request.user.is_authenticated:
         return redirect('home')
+    
+    error = None
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         email = request.POST.get('email')
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
+        
         if User.objects.filter(username=username).exists():
-            messages.error(request, 'Nome de usuário já existe.')
-            return render(request, 'core/register.html')
+            error = 'Nome de usuário já existe.'
+            return render(request, 'core/register.html', {'error': error})
+        
+        if User.objects.filter(email=email).exists():
+            error = 'E-mail já cadastrado.'
+            return render(request, 'core/register.html', {'error': error})
+            
         if len(password) < 12:
-            messages.error(request, 'A senha deve ter pelo menos 12 caracteres.')
-            return render(request, 'core/register.html')
+            error = 'A senha deve ter pelo menos 12 caracteres.'
+            return render(request, 'core/register.html', {'error': error})
+            
+        if not re.search(r'[A-Z]', password):
+            error = 'A senha deve ter pelo menos uma letra maiúscula.'
+            return render(request, 'core/register.html', {'error': error})
+            
+        if not re.search(r'[a-z]', password):
+            error = 'A senha deve ter pelo menos uma letra minúscula.'
+            return render(request, 'core/register.html', {'error': error})
+            
+        if not re.search(r'[0-9]', password):
+            error = 'A senha deve ter pelo menos um número.'
+            return render(request, 'core/register.html', {'error': error})
+            
+        if not re.search(r'[!@#$%&*._]', password):
+            error = 'A senha deve ter pelo menos um caractere especial.'
+            return render(request, 'core/register.html', {'error': error})
+            
         user = User.objects.create_user(username=username, password=password,
                                         email=email, first_name=first_name, last_name=last_name)
         login(request, user)
         return redirect('home')
     return render(request, 'core/register.html')
 
-
 # Home
 def home(request):
     return render(request, 'core/home.html')
-
 
 # RF02 e RF03
 def catalog(request):
@@ -78,7 +100,6 @@ def animal_detail(request, pk):
     can_manage = request.user.is_authenticated and request.user.can_manage_animals()
     return render(request, 'core/animal_detail.html', {'animal': animal, 'can_manage': can_manage})
 
-
 @login_required
 def animal_create(request):
     if not request.user.can_manage_animals():
@@ -102,7 +123,6 @@ def animal_create(request):
             animal.save()
         return redirect('animal_detail', pk=animal.pk)
     return render(request, 'core/animal_form.html', {'title': 'Cadastrar Animal'})
-
 
 @login_required
 def animal_edit(request, pk):
