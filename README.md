@@ -12,9 +12,6 @@ git clone https://github.com/HenriquePapai/RescueHub
 ```bash
 docker-compose up --build
 ```
-```bash
-docker-compose exec web python manage.py migrate
-```
 ## 3. Acessar o serviço:
 ```bash
 http://127.0.0.1:8000/
