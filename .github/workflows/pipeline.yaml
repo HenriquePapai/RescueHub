@@ -5,15 +5,65 @@ on:
   - workflow_dispatch
 
 jobs:
-  tarefa:
-    name: Olá, mundo!
-    runs-on: self-hosted
+  bandit:
+    name: Bandit - SAST
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout código
+      - name: Checkout
         uses: actions/checkout@v4
-      - name: Echo
-        run: echo "Olá, mundo!"
-      - name: Nikto
-        run: nikto -host http://rescuehub_web:8000
-      - name: Bandit
+      - name: Setup-Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar Bandit
+        run: pip install bandit
+      - name: Execucao Bandit
         run: bandit -r .
+  
+  snyk-sast:
+    name: Snyk - SAST
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup-Snyk
+        uses: snyk/actions/setup@master
+      - name: Snyk-Scan
+        run: snyk code test --org=${{ secrets.Snyk-Org }}
+        env:
+          Snyk-Token: ${{ secrets.Snyk-Token }}
+
+  snyk-sca:
+    name: Snyk - SCA
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+      - uses: actions/checkout@v4
+      - name: Setup-Snyk
+        uses: snyk/actions/python@0.4.0
+        env:
+          Snyk-Token: ${{ secrets.Snyk-Token }}
+        with:
+          command: test
+          args: --file=requirements.txt --org=${{ secrets.Snyk-Org }}
+
+  delivery:
+    name: Build-Push
+    needs: [bandit, snyk-sast, snyk-sca]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Login no Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.Docker-Username }}
+          password: ${{ secrets.Docker-Password }}
+      - name: Envio para o Docker Hub
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.Docker-Username }}/rescue-hub:latest
+      - name: Logout
+        run: docker logout
