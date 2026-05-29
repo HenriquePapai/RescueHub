@@ -63,6 +63,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./docker/web/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/rescue-hub:latest
       - name: Logout
