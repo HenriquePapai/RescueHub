@@ -1,4 +1,4 @@
-name: "Formativa"
+name: "Projeto"
 
 on:
   - push
@@ -29,23 +29,23 @@ jobs:
       - name: Setup-Snyk
         uses: snyk/actions/setup@master
       - name: Snyk-Scan
-        run: snyk code test --org=${{ secrets.Snyk-Org }}
+        run: snyk code test --org=${{ secrets.SNYK_ORG }}
         env:
-          Snyk-Token: ${{ secrets.Snyk-Token }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   snyk-sca:
     name: Snyk - SCA
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-      - uses: actions/checkout@v4
+        uses: actions/checkout@v4
       - name: Setup-Snyk
         uses: snyk/actions/python@0.4.0
         env:
-          Snyk-Token: ${{ secrets.Snyk-Token }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: test
-          args: --file=requirements.txt --org=${{ secrets.Snyk-Org }}
+          args: --file=requirements.txt --org=${{ secrets.SNYK_ORG }}
 
   delivery:
     name: Build-Push
