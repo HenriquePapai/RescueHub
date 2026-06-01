@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import User, Animal
+from .models import User, Animal, AdoptionRequest
 import re
 
 
@@ -145,3 +145,38 @@ def animal_edit(request, pk):
         animal.save()
         return redirect('animal_detail', pk=animal.pk)
     return render(request, 'core/animal_form.html', {'title': f'Editar {animal.name}', 'animal': animal})
+
+@login_required
+def solicitar_adocao(request, pk):
+    animal_selecionado = get_object_or_404(Animal, pk=pk)
+    if not request.user.is_adotante():
+        messages.error(request, 'Apenas usuários com perfil "Adotante" podem solicitar adoções.')
+        return redirect('animal_detail', pk=animal_selecionado.pk)
+        
+    if animal_selecionado.status != 'disponivel':
+        messages.error(request, 'Este animal não está mais disponível para adoção.')
+        return redirect('animal_detail', pk=animal_selecionado.pk)
+        
+    if request.method == 'POST':
+        arquivo_documento = request.FILES.get('documento')
+        
+        # Valida o arquivo e se a extensão é PDF
+        if not arquivo_documento or not arquivo_documento.name.lower().endswith('.pdf'):
+            messages.error(request, 'Você deve anexar a documentação obrigatória estritamente no formato PDF.')
+        else:
+            # Cria a solicitação no Serviço de Adoções
+            AdoptionRequest.objects.create(
+                animal=animal_selecionado,
+                adotante=request.user,
+                document=arquivo_documento,
+                status='pendente'
+            )
+            
+            # Atualiza o status do animal
+            animal_selecionado.status = 'em_processo'
+            animal_selecionado.save()
+            
+            messages.success(request, 'Sua solicitação de adoção foi enviada com sucesso! Em breve nossa equipe entrará em contato.')
+            return redirect('animal_detail', pk=animal_selecionado.pk)
+            
+    return render(request, 'core/adoption_form.html', {'animal': animal_selecionado})

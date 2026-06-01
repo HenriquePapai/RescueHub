@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Solicitar Adoção — RescueHub{% endblock %}
+
+{% block extra_css %}
+  <link href="{% static 'css/forms.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="box-formulario">
+  <div class="linha-centralizada">
+    <div class="conteudo-formulario">
+      <div class="cartao-formulario">
+        <h5 class="titulo-principal">Solicitar Adoção: {{ animal.name }}</h5>
+        
+        <p class="texto-instrucao-adocao">
+          Para prosseguirmos com a adoção responsável do(a) {{ animal.name }}, precisamos de algumas documentações.
+        </p>
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="grade-campos">
+            
+            <div class="campos-menores">
+              <label class="rotulo-campo">Documentação Obrigatória (PDF)</label>
+              
+              <span class="documentacao">
+                Por favor, junte seu RG, CPF e Comprovante de Residência em um único arquivo PDF e faça o upload abaixo.
+              </span>
+              
+              <input name="documento" type="file" class="campo-entrada" accept="application/pdf" required>
+            </div>
+
+          </div>
+          <div class="container-acoes-botoes">
+            <button class="button">Enviar Solicitação</button>
+            <a href="/animais/{{ animal.pk }}/" class="btn-cancel">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

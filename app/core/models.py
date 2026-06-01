@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-
 class User(AbstractUser):
     ROLES = [
         ('adotante', 'Adotante'),
@@ -59,3 +58,25 @@ class Animal(models.Model):
         verbose_name = 'Animal'
         verbose_name_plural = 'Animais'
         
+class AdoptionRequest(models.Model):
+    STATUS_OPCOES = [
+        ('pendente', 'Pendente'),
+        ('em_analise', 'Em Análise'),
+        ('aprovado', 'Aprovado'),
+        ('rejeitado', 'Rejeitado'),
+    ]
+
+    animal = models.ForeignKey(Animal, on_delete=models.CASCADE, related_name='pedidos_adocao')
+    adotante = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pedidos_adocao')
+    document = models.FileField('Documentação', upload_to='documentos/')
+    status = models.CharField('Status', max_length=20, choices=STATUS_OPCOES, default='pendente')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'Pedido de {self.adotante.username} para {self.animal.name}'
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Pedido de Adoção'
+        verbose_name_plural = 'Pedidos de Adoção'
