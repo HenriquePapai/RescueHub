@@ -12,12 +12,18 @@
 <nav class="barra-navegacao">
   <div class="bloco-navegacao">
     <a class="logo-site" href="/">RescueHub</a>
-    
+
     <div class="menu-links">
       <ul class="link-catalogo">
         <li><a class="link-item" href="/catalogo/">Catálogo</a></li>
+
+        {% if user.is_authenticated and user.role == 'adotante' %}
+        <li><a class="link-item" href="{% url 'meus_pedidos' %}">Meus Pedidos</a></li>
+        {% endif %}
+
         {% if user.is_authenticated and user.role == 'voluntario' or user.is_authenticated and user.role == 'admin' or user.is_superuser %}
         <li><a class="link-item" href="/animais/novo/">Cadastrar Animal</a></li>
+        <li><a class="link-item" href="{% url 'gerenciar_adocoes' %}">Gerenciar Adoções</a></li>
         {% endif %}
       </ul>
 

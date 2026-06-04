@@ -1,0 +1,53 @@
+.info-adocao-container {
+  margin-bottom: 1.5rem;
+}
+
+.link-documento {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.box-logs-auditoria {
+  background: #f8faf8;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+}
+
+.titulo-logs {
+  margin-top: 0;
+}
+
+.lista-logs {
+  margin-bottom: 0;
+  padding-left: 20px;
+  font-size: 0.9rem;
+}
+
+.alerta-margem {
+  margin-bottom: 1rem;
+}
+
+.texto-centralizado {
+  text-align: center;
+}
+
+.botao-tabela {
+  margin: 0;
+}
+
+.lista-historico {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.item-historico {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.item-historico-vazio {
+  font-size: 0.85rem;
+  color: #777;
+}

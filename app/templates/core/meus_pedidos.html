@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link href="{% static 'css/forms.css' %}" rel="stylesheet">
+  <link href="{% static 'css/adocoes.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="box-principal">
+  <div class="cabecalho-animal">
+    <h2>Meus Pedidos de Adoção</h2>
+  </div>
+  <table class="table-custom">
+    <thead>
+      <tr>
+        <th>Animal</th>
+        <th>Data da Solicitação</th>
+        <th>Status</th>
+        <th>Histórico de Andamento</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pedido in pedidos %}
+      <tr>
+        <td><strong>{{ pedido.animal.name }}</strong></td>
+        <td>{{ pedido.created_at|date:"d/m/Y H:i" }}</td>
+        <td><span class="status status-{{ pedido.status }}">{{ pedido.get_status_display }}</span></td>
+        <td>
+          <ul class="lista-historico">
+            {% for log in pedido.audit_logs.all %}
+              <li class="item-historico">{{ log.timestamp|date:"d/m/Y H:i" }} - {{ log.action }}</li>
+            {% empty %}
+              <li class="item-historico-vazio">Em análise inicial.</li>
+            {% endfor %}
+          </ul>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" class="texto-centralizado">Nenhuma solicitação encontrada.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

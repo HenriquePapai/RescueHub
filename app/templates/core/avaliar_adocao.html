@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link href="{% static 'css/forms.css' %}" rel="stylesheet">
+  <link href="{% static 'css/adocoes.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="box-formulario">
+  <div class="linha-centralizada">
+    <div class="conteudo-formulario">
+      <div class="cartao-formulario">
+        <h5 class="titulo-principal">Avaliar Adoção: {{ pedido.animal.name }}</h5>
+        
+        <div class="info-adocao-container">
+          <p><strong>Adotante:</strong> {{ pedido.adotante.get_full_name|default:pedido.adotante.username }} ({{ pedido.adotante.email }})</p>
+          <p><strong>Documentação:</strong> <a href="{{ pedido.document.url }}" target="_blank" class="link-documento">Visualizar PDF</a></p>
+          <p><strong>Status Atual:</strong> <span class="status status-{{ pedido.status }}">{{ pedido.get_status_display }}</span></p>
+        </div>
+
+        <div class="box-logs-auditoria">
+            <h6 class="titulo-logs">Logs de Auditoria</h6>
+            <ul class="lista-logs">
+                {% for log in pedido.audit_logs.all %}
+                  <li><strong>{{ log.timestamp|date:"d/m/Y H:i" }}</strong> - ({{ log.user.username }}) {{ log.action }}</li>
+                {% empty %}
+                  <li>Nenhum log registrado ainda.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% if user.role == 'admin' or user.is_superuser %}
+            <form method="post">
+            {% csrf_token %}
+            <div class="grade-campos">
+                <div class="campos-menores">
+                <label class="rotulo-campo">Alterar Status</label>
+                <select name="status" class="campo-entrada">
+                    {% for valor, nome in pedido.STATUS_OPCOES %}
+                        <option value="{{ valor }}" {% if pedido.status == valor %}selected{% endif %}>{{ nome }}</option>
+                    {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="container-acoes-botoes">
+                <button type="submit" class="button">Salvar Decisão</button>
+                <a href="{% url 'gerenciar_adocoes' %}" class="btn-cancel">Voltar</a>
+            </div>
+            </form>
+        {% else %}
+            <div class="box-alerta alerta-info alerta-margem">
+                Como voluntário, você pode visualizar os dados, mas apenas administradores podem aprovar ou rejeitar adoções.
+            </div>
+            <a href="{% url 'gerenciar_adocoes' %}" class="btn-cancel">Voltar</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
