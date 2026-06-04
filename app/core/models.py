@@ -21,6 +21,9 @@ class User(AbstractUser):
 
     def can_manage_animals(self):
         return self.role in ('admin', 'voluntario') or self.is_superuser
+    
+    def can_approve_adoptions(self):
+        return self.role == 'admin' or self.is_superuser
 
     class Meta:
         verbose_name = 'Usuário'
@@ -80,3 +83,14 @@ class AdoptionRequest(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Pedido de Adoção'
         verbose_name_plural = 'Pedidos de Adoção'
+
+class AuditLog(models.Model):
+    adoption_request = models.ForeignKey('AdoptionRequest', on_delete=models.CASCADE, related_name='audit_logs')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    action = models.CharField('Ação', max_length=255)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name = 'Log de Auditoria'
+        verbose_name_plural = 'Logs de Auditoria'

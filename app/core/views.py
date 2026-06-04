@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import User, Animal, AdoptionRequest
+from .models import User, Animal, AdoptionRequest, AuditLog
 import re
 
 
@@ -180,3 +180,64 @@ def solicitar_adocao(request, pk):
             return redirect('animal_detail', pk=animal_selecionado.pk)
             
     return render(request, 'core/adoption_form.html', {'animal': animal_selecionado})
+
+# Req 8: Área do adotante
+@login_required
+def meus_pedidos(request):
+    if not request.user.is_adotante():
+        messages.error(request, 'Acesso restrito para adotantes.')
+        return redirect('home')
+    
+    pedidos = AdoptionRequest.objects.filter(adotante=request.user).order_by('-created_at')
+    return render(request, 'core/meus_pedidos.html', {'pedidos': pedidos})
+
+# Req 9: Área de gerêncianciamento
+@login_required
+def gerenciar_adocoes(request):
+    if not request.user.can_manage_animals():
+        messages.error(request, 'Acesso negado.')
+        return redirect('home')
+    
+    pedidos = AdoptionRequest.objects.all().order_by('-created_at')
+    return render(request, 'core/gerenciar_adocoes.html', {'pedidos': pedidos})
+
+# Req 10: Aprovação e Log de Auditoria
+@login_required
+def avaliar_adocao(request, pk):
+    if not request.user.can_manage_animals():
+        return redirect('home')
+        
+    pedido = get_object_or_404(AdoptionRequest, pk=pk)
+    
+    if request.method == 'POST':
+        # Apenas admins podem aprovar/rejeitar (Requisito 2)
+        if not request.user.can_approve_adoptions():
+            messages.error(request, 'Apenas administradores podem alterar o status de adoções.')
+            return redirect('avaliar_adocao', pk=pedido.pk)
+            
+        novo_status = request.POST.get('status')
+        status_opcoes_dict = dict(AdoptionRequest.STATUS_OPCOES)
+        
+        if novo_status in status_opcoes_dict:
+            status_antigo_display = pedido.get_status_display()
+            pedido.status = novo_status
+            pedido.save()
+            
+            # Requisito 3: Registrar Log
+            AuditLog.objects.create(
+                adoption_request=pedido,
+                user=request.user,
+                action=f"Status alterado de '{status_antigo_display}' para '{pedido.get_status_display()}'"
+            )
+            
+            # Atualiza status do animal se necessário
+            if novo_status == 'aprovado':
+                pedido.animal.status = 'adotado'
+            elif novo_status in ['rejeitado', 'pendente']:
+                pedido.animal.status = 'disponivel'
+            pedido.animal.save()
+            
+            messages.success(request, 'Status da adoção atualizado com sucesso.')
+            return redirect('gerenciar_adocoes')
+            
+    return render(request, 'core/avaliar_adocao.html', {'pedido': pedido})
