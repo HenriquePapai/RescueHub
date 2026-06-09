@@ -68,3 +68,48 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/rescue-hub:latest
       - name: Logout
         run: docker logout
+
+  backup:
+    name: Backup - PostgreSQL
+    needs: [delivery]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar cliente PostgreSQL
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+
+      - name: Subir banco de dados via Docker Compose
+        run: |
+          docker compose up -d db
+          echo "Aguardando PostgreSQL ficar pronto..."
+          for i in $(seq 1 30); do
+            docker compose exec -T db pg_isready -U ${{ secrets.DATABASE_USER }} && break
+            sleep 2
+          done
+
+      - name: Executar backup
+        id: run_backup
+        env:
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+          DATABASE_USER: ${{ secrets.DATABASE_USER }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+        run: |
+          chmod +x scripts/backup_db.sh
+          bash scripts/backup_db.sh
+
+      - name: Upload do backup como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rescuehub-db-backup-${{ github.run_number }}
+          path: backups/
+          retention-days: 30
+
+      - name: Parar containers
+        if: always()
+        run: docker compose down

@@ -1,0 +1,3 @@
+-e # Backups locais (gerados por scripts/backup_db.sh)
+backups/
+*.sql.gz
