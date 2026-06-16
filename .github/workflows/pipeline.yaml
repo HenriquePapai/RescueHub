@@ -5,7 +5,6 @@ on:
   - workflow_dispatch
 
 jobs:
-  # ── CI: SAST com Bandit ────────────────────────────────────────────────
   bandit:
     name: Bandit - SAST
     runs-on: ubuntu-latest
@@ -19,9 +18,8 @@ jobs:
       - name: Instalar Bandit
         run: pip install bandit
       - name: Execucao Bandit
-        run: bandit -r . -x ./venv,./env
+        run: bandit -r .
 
-  # ── CI: SAST com Snyk ─────────────────────────────────────────────────
   snyk-sast:
     name: Snyk - SAST
     runs-on: ubuntu-latest
@@ -35,7 +33,6 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-  # ── CI: SCA com Snyk ──────────────────────────────────────────────────
   snyk-sca:
     name: Snyk - SCA
     runs-on: ubuntu-latest
@@ -50,7 +47,7 @@ jobs:
           command: test
           args: --file=requirements.txt --org=${{ secrets.SNYK_ORG }}
 
-  # ── CD: Build & Push imagem Docker ────────────────────────────────────
+  # ── CD: Build & Push imagem Docker
   delivery:
     name: Build-Push
     needs: [bandit, snyk-sast, snyk-sca]
@@ -73,7 +70,7 @@ jobs:
       - name: Logout
         run: docker logout
 
-  # ── CD: Deploy contínuo no Kubernetes ─────────────────────────────────
+  # ── CD: Deploy contínuo no Kubernetes
   deploy:
     name: Deploy - Kubernetes
     needs: [delivery]
@@ -82,22 +79,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Configura o kubeconfig a partir do secret do repositório
-      - name: Configurar kubeconfig
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
+      - name: Criar cluster Kubernetes com Kind
+        uses: helm/kind-action@v1.10.0
+        with:
+          cluster_name: rescuehub
 
       - name: Instalar kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'v1.29.0'
 
-      # Substitui o placeholder da imagem pelo usuário Docker Hub real
+      # Atualiza a imagem local pela imagem que acabou de ir pro Docker Hub
       - name: Atualizar referência da imagem no manifest
         run: |
-          sed -i "s|DOCKER_USERNAME|${{ secrets.DOCKER_USERNAME }}|g" k8s/base/web.yaml
+          sed -i "s|image: rescue-hub:local|image: ${{ secrets.DOCKER_USERNAME }}/rescue-hub:latest|g" k8s/base/web.yaml
+          sed -i "s|imagePullPolicy: Never|imagePullPolicy: Always|g" k8s/base/web.yaml
 
       # Aplica os manifests na ordem correta
       - name: Criar namespace
@@ -147,7 +143,7 @@ jobs:
           echo "=== Services ==="
           kubectl get svc -n rescuehub
 
-  # ── Backup do banco ────────────────────────────────────────────────────
+  # ── Backup do banco
   backup:
     name: Backup - PostgreSQL
     needs: [delivery]
