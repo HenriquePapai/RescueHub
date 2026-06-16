@@ -79,29 +79,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Criar cluster Kubernetes com Kind
-        uses: helm/kind-action@v1.10.0
-        with:
-          cluster_name: rescuehub
-
       - name: Instalar kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'v1.29.0'
 
-      # Atualiza a imagem local pela imagem que acabou de ir pro Docker Hub
-      - name: Atualizar referência da imagem no manifest
+      - name: Criar cluster Kind
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: rescuehub
+
+      - name: Atualizar referência da imagem
         run: |
           sed -i "s|image: rescue-hub:local|image: ${{ secrets.DOCKER_USERNAME }}/rescue-hub:latest|g" k8s/base/web.yaml
           sed -i "s|imagePullPolicy: Never|imagePullPolicy: Always|g" k8s/base/web.yaml
 
-      # Aplica os manifests na ordem correta
       - name: Criar namespace
         run: kubectl apply -f k8s/base/namespace.yaml
 
-      - name: Aplicar Secret
+      - name: Criar Secret
         run: |
-          # Usa variáveis do GitHub Secrets para não commitar credenciais
           kubectl create secret generic rescuehub-secret \
             --namespace=rescuehub \
             --from-literal=DATABASE_NAME=${{ secrets.DATABASE_NAME }} \
@@ -116,11 +113,6 @@ jobs:
       - name: Aplicar banco de dados
         run: kubectl apply -f k8s/base/db.yaml
 
-      - name: Aguardar banco pronto
-        run: |
-          kubectl rollout status statefulset/rescuehub-db \
-            --namespace=rescuehub --timeout=120s
-
       - name: Aplicar aplicação web
         run: kubectl apply -f k8s/base/web.yaml
 
@@ -128,13 +120,6 @@ jobs:
         run: |
           kubectl apply -f k8s/gateway/configmap.yaml
           kubectl apply -f k8s/gateway/gateway.yaml
-
-      - name: Aguardar rollout completo
-        run: |
-          kubectl rollout status deployment/rescuehub-web \
-            --namespace=rescuehub --timeout=180s
-          kubectl rollout status deployment/rescuehub-gateway \
-            --namespace=rescuehub --timeout=120s
 
       - name: Status final do cluster
         run: |
