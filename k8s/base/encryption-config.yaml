@@ -1,0 +1,21 @@
+# EncryptionConfiguration — habilita criptografia AES-CBC para Secrets no etcd
+# Para aplicar:
+#   1. Gere uma chave de 32 bytes:  head -c 32 /dev/urandom | base64
+#   2. Substitua o valor em 'secret' abaixo
+#   3. Copie este arquivo para /etc/kubernetes/encryption-config.yaml no control-plane
+#   4. No kube-apiserver adicione o flag:
+#        --encryption-provider-config=/etc/kubernetes/encryption-config.yaml
+#   5. Force a re-encriptação dos Secrets já existentes:
+#        kubectl get secrets --all-namespaces -o json | kubectl replace -f -
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+      - secrets
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              # SUBSTITUA pelo output de: head -c 32 /dev/urandom | base64
+              secret: <BASE64_32_BYTES_KEY>
+      - identity: {}   # fallback para leitura de Secrets não-criptografados antigos

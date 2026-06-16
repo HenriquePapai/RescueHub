@@ -1,0 +1,92 @@
+---
+# Deployment do API Gateway (Nginx)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rescuehub-gateway
+  namespace: rescuehub
+  labels:
+    app: rescuehub-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rescuehub-gateway
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: rescuehub-gateway
+    spec:
+      # ── Segurança de infraestrutura ──────────────────────────────────────
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101          # uid do nginx no nginx:alpine
+        runAsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+      # ────────────────────────────────────────────────────────────────────
+      containers:
+        - name: nginx
+          image: nginxinc/nginx-unprivileged:1.27-alpine
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+          # ── Segurança do container ───────────────────────────────────────
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false   # nginx precisa de /var/cache e /var/run
+            capabilities:
+              drop:
+                - ALL
+          # ────────────────────────────────────────────────────────────────
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 20
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-gateway-config
+
+---
+# Service externo — único ponto de entrada do cluster
+apiVersion: v1
+kind: Service
+metadata:
+  name: rescuehub-gateway
+  namespace: rescuehub
+  labels:
+    app: rescuehub-gateway
+spec:
+  selector:
+    app: rescuehub-gateway
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      nodePort: 30080
+  type: NodePort     # Use LoadBalancer se o cluster suportar (ex: GKE, EKS)

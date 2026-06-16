@@ -1,35 +1,106 @@
 # RescueHub
+
 O RescueHub é uma plataforma web para a gestão de abrigos de animais, projetada para automatizar fluxos de adoção de cães e gatos. O sistema utiliza uma arquitetura de microsserviços para escalabilidade e disponibilidade. O projeto é feito com uma interface Django que se comunica via API Gateway com serviços independentes de Autenticação, Animais, Catálogo e Adoções.
 
 ---
 
 # Instalação e Execução
-## 1. Clonar o repositório:
+
+## 1. Clonar o repositório
+
 ```bash
-git clone https://github.com/HenriquePapai/RescueHub
+git clone https://github.com/HenriquePapai/RescueHub.git
+cd RescueHub
 ```
-## 2. Subir os serviços:
+
+## 2. Criar o cluster Kubernetes
+
 ```bash
-docker-compose up --build
+kind create cluster --name rescuehub
 ```
-## 3. Acessar o serviço:
+
+## 3. Construir a imagem da aplicação
+
 ```bash
-http://127.0.0.1:8000/
+docker build -t rescue-hub:local -f docker/web/Dockerfile .
 ```
-## 4. Para criar um super usuário:
+
+## 4. Carregar a imagem no cluster
+
+```bash
+kind load docker-image rescue-hub:local --name rescuehub
 ```
-docker exec -it rescuehub_web python app/manage.py createsuperuser
+
+## 5. Implantar os componentes
+
+```bash
+kubectl apply -f k8s/base/
 ```
+
+## 6. Verificar a implantação
+
+```bash
+kubectl get pods -n rescuehub
+```
+
+Todos os pods devem estar em estado `Running`.
+
+## 7. Acessar a aplicação
+
+```bash
+kubectl port-forward svc/rescuehub-gateway 8080:8080 -n rescuehub
+```
+
+Acesse:
+
+```
+http://localhost:8080
+```
+
+## 8. Criar superusuário (opcional)
+
+```bash
+kubectl exec -it deployment/rescuehub-web -n rescuehub -- python app/manage.py createsuperuser
+```
+
+---
+
 # Backup e Restauração
-## 1. Backup manual:
+
+## Backup manual
+
 ```bash
 scripts/backup_db.sh
 ```
-## 2. Restaurar um backup:
+
+## Restaurar backup
+
 ```bash
 scripts/restore_db.sh backups/rescuehub_YYYYMMDD_HHMMSS.sql.gz
 ```
-## 3. Backup automático via pipeline:
-A cada push, o job Backup - PostgreSQL roda automaticamente após o delivery.
-Para acompanhar: GitHub → Actions → run mais recente → Artifacts.
-Para disparar manualmente: GitHub → Actions → Projeto → Run workflow.
+
+## Backup automático via pipeline
+
+A cada push, o job de backup do PostgreSQL é executado automaticamente pela pipeline GitHub Actions.
+
+Os artefatos podem ser consultados em:
+
+GitHub → Actions → Workflow Executions → Artifacts
+
+---
+
+# Arquitetura
+
+Cliente → API Gateway (Nginx) → Aplicação Django → PostgreSQL
+
+---
+
+# Segurança
+
+* API Gateway com rate limiting
+* Cabeçalhos HTTP de segurança
+* Execução de containers sem privilégios de root
+* Seccomp RuntimeDefault
+* Remoção de capabilities Linux
+* Secrets do Kubernetes para credenciais
+* Verificações SAST e SCA na pipeline CI/CD

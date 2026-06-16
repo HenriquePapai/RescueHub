@@ -5,6 +5,7 @@ on:
   - workflow_dispatch
 
 jobs:
+  # ── CI: SAST com Bandit ────────────────────────────────────────────────
   bandit:
     name: Bandit - SAST
     runs-on: ubuntu-latest
@@ -18,8 +19,9 @@ jobs:
       - name: Instalar Bandit
         run: pip install bandit
       - name: Execucao Bandit
-        run: bandit -r .
-  
+        run: bandit -r . -x ./venv,./env
+
+  # ── CI: SAST com Snyk ─────────────────────────────────────────────────
   snyk-sast:
     name: Snyk - SAST
     runs-on: ubuntu-latest
@@ -33,6 +35,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
+  # ── CI: SCA com Snyk ──────────────────────────────────────────────────
   snyk-sca:
     name: Snyk - SCA
     runs-on: ubuntu-latest
@@ -47,6 +50,7 @@ jobs:
           command: test
           args: --file=requirements.txt --org=${{ secrets.SNYK_ORG }}
 
+  # ── CD: Build & Push imagem Docker ────────────────────────────────────
   delivery:
     name: Build-Push
     needs: [bandit, snyk-sast, snyk-sca]
@@ -69,6 +73,81 @@ jobs:
       - name: Logout
         run: docker logout
 
+  # ── CD: Deploy contínuo no Kubernetes ─────────────────────────────────
+  deploy:
+    name: Deploy - Kubernetes
+    needs: [delivery]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Configura o kubeconfig a partir do secret do repositório
+      - name: Configurar kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Instalar kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.29.0'
+
+      # Substitui o placeholder da imagem pelo usuário Docker Hub real
+      - name: Atualizar referência da imagem no manifest
+        run: |
+          sed -i "s|DOCKER_USERNAME|${{ secrets.DOCKER_USERNAME }}|g" k8s/base/web.yaml
+
+      # Aplica os manifests na ordem correta
+      - name: Criar namespace
+        run: kubectl apply -f k8s/base/namespace.yaml
+
+      - name: Aplicar Secret
+        run: |
+          # Usa variáveis do GitHub Secrets para não commitar credenciais
+          kubectl create secret generic rescuehub-secret \
+            --namespace=rescuehub \
+            --from-literal=DATABASE_NAME=${{ secrets.DATABASE_NAME }} \
+            --from-literal=DATABASE_USER=${{ secrets.DATABASE_USER }} \
+            --from-literal=DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+            --from-literal=DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} \
+            --from-literal=POSTGRES_DB=${{ secrets.DATABASE_NAME }} \
+            --from-literal=POSTGRES_USER=${{ secrets.DATABASE_USER }} \
+            --from-literal=POSTGRES_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Aplicar banco de dados
+        run: kubectl apply -f k8s/base/db.yaml
+
+      - name: Aguardar banco pronto
+        run: |
+          kubectl rollout status statefulset/rescuehub-db \
+            --namespace=rescuehub --timeout=120s
+
+      - name: Aplicar aplicação web
+        run: kubectl apply -f k8s/base/web.yaml
+
+      - name: Aplicar API Gateway
+        run: |
+          kubectl apply -f k8s/gateway/configmap.yaml
+          kubectl apply -f k8s/gateway/gateway.yaml
+
+      - name: Aguardar rollout completo
+        run: |
+          kubectl rollout status deployment/rescuehub-web \
+            --namespace=rescuehub --timeout=180s
+          kubectl rollout status deployment/rescuehub-gateway \
+            --namespace=rescuehub --timeout=120s
+
+      - name: Status final do cluster
+        run: |
+          echo "=== Pods ==="
+          kubectl get pods -n rescuehub
+          echo "=== Services ==="
+          kubectl get svc -n rescuehub
+
+  # ── Backup do banco ────────────────────────────────────────────────────
   backup:
     name: Backup - PostgreSQL
     needs: [delivery]

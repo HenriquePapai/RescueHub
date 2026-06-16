@@ -1,0 +1,108 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: rescuehub
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# StatefulSet — garante identidade estável e persistência para o banco
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rescuehub-db
+  namespace: rescuehub
+  labels:
+    app: rescuehub-db
+spec:
+  serviceName: rescuehub-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rescuehub-db
+  template:
+    metadata:
+      labels:
+        app: rescuehub-db
+    spec:
+      # ── Segurança de infraestrutura ──────────────────────────────────────
+      securityContext:
+        runAsNonRoot: true
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      
+      # ────────────────────────────────────────────────────────────────────
+      containers:
+        - name: postgres
+          image: bitnami/postgresql:latest
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRESQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: rescuehub-secret
+                  key: POSTGRES_DB
+
+            - name: POSTGRESQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rescuehub-secret
+                  key: POSTGRES_USER
+
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rescuehub-secret
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+          # ── Segurança do container ─────────────────────────────────────
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false   # postgres precisa escrever em /var/run
+            capabilities:
+              drop:
+                - ALL
+          # ──────────────────────────────────────────────────────────────
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "rescuehub"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+
+---
+# Service interno — só acessível dentro do cluster
+apiVersion: v1
+kind: Service
+metadata:
+  name: rescuehub-db
+  namespace: rescuehub
+  labels:
+    app: rescuehub-db
+spec:
+  selector:
+    app: rescuehub-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+  clusterIP: None

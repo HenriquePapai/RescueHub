@@ -1,0 +1,138 @@
+---
+# Deployment — garante alta disponibilidade com 2 réplicas e rollout automático
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rescuehub-web
+  namespace: rescuehub
+  labels:
+    app: rescuehub-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rescuehub-web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0       # zero downtime durante updates
+  template:
+    metadata:
+      labels:
+        app: rescuehub-web
+    spec:
+      # ── Segurança de infraestrutura (Pod Security) ───────────────────────
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      # ────────────────────────────────────────────────────────────────────
+      initContainers:
+        # Aguarda o banco estar pronto antes de subir a app
+        - name: wait-for-db
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z rescuehub-db 5432; do
+                echo "Aguardando PostgreSQL..."; sleep 2;
+              done
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities:
+              drop: ["ALL"]
+      containers:
+        - name: web
+          image: DOCKER_USERNAME/rescue-hub:latest
+          imagePullPolicy: Always
+          command:
+            - sh
+            - -c
+            - |
+              python app/manage.py migrate --noinput && \
+              python app/manage.py collectstatic --noinput && \
+              gunicorn rescuehub.wsgi:application \
+                --bind 0.0.0.0:8000 \
+                --workers 2 \
+                --chdir app
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DEBUG
+              value: "0"
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rescuehub-secret
+                  key: DJANGO_SECRET_KEY
+            - name: DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: rescuehub-secret
+                  key: DATABASE_NAME
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rescuehub-secret
+                  key: DATABASE_USER
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rescuehub-secret
+                  key: DATABASE_PASSWORD
+            - name: DATABASE_HOST
+              value: rescuehub-db
+            - name: DATABASE_PORT
+              value: "5432"
+          # ── Segurança do container ───────────────────────────────────────
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false   # Django precisa escrever mídia/static
+            capabilities:
+              drop:
+                - ALL
+          # ────────────────────────────────────────────────────────────────
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+
+---
+# Service interno — expõe a app para o API Gateway
+apiVersion: v1
+kind: Service
+metadata:
+  name: rescuehub-web
+  namespace: rescuehub
+  labels:
+    app: rescuehub-web
+spec:
+  selector:
+    app: rescuehub-web
+  ports:
+    - port: 80
+      targetPort: 8000
+  type: ClusterIP
