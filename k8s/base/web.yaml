@@ -51,8 +51,8 @@ spec:
               drop: ["ALL"]
       containers:
         - name: web
-          image: DOCKER_USERNAME/rescue-hub:latest
-          imagePullPolicy: Always
+          image: rescue-hub:local
+          imagePullPolicy: Never
           command:
             - sh
             - -c
