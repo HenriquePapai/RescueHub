@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rescuehub-config
+  namespace: rescuehub
+  labels:
+    app.kubernetes.io/name: rescuehub-config
+    app.kubernetes.io/part-of: rescuehub
+data:
+  DEBUG: "1"
+  DATABASE_NAME: "rescuehub"
+  DATABASE_USER: "rescuehub"
+  DATABASE_HOST: "postgres"
+  DATABASE_PORT: "5432"
+  ALLOWED_HOSTS: "localhost,127.0.0.1,rescuehub.local"
+  CSRF_TRUSTED_ORIGINS: "http://rescuehub.local"

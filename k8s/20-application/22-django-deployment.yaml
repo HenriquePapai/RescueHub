@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rescuehub-web
+  namespace: rescuehub
+  labels:
+    app.kubernetes.io/name: rescuehub-web
+    app.kubernetes.io/component: web
+    app.kubernetes.io/part-of: rescuehub
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rescuehub-web
+      app.kubernetes.io/component: web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rescuehub-web
+        app.kubernetes.io/component: web
+        app.kubernetes.io/part-of: rescuehub
+    spec:
+      securityContext:
+        fsGroup: 10001
+      containers:
+        - name: django
+          image: rescuehub-web:local
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+          args:
+            - python app/manage.py runserver 0.0.0.0:8000
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: rescuehub-config
+          env:
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rescuehub-secret
+                  key: DJANGO_SECRET_KEY
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rescuehub-secret
+                  key: DATABASE_PASSWORD
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: django-media
+              mountPath: /app/app/media
+      volumes:
+        - name: django-media
+          persistentVolumeClaim:
+            claimName: django-media-pvc
