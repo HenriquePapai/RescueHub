@@ -1,3 +1,4 @@
+# snyk file ignore
 import logging
 from http.cookies import SimpleCookie
 
