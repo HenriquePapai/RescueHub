@@ -5,21 +5,24 @@ metadata:
   namespace: rescuehub
   labels:
     app.kubernetes.io/name: rescuehub-ingress
-    app.kubernetes.io/component: gateway
+    app.kubernetes.io/component: ingress
     app.kubernetes.io/part-of: rescuehub
   annotations:
     # Importante para upload de PDFs/documentos pelo formulário de adoção.
     nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
 spec:
   ingressClassName: nginx
   rules:
-    - host: rescuehub.local
-      http:
+    # Sem host fixo para funcionar melhor no Codespaces e em laboratório local.
+    # Se quiser usar domínio local, adicione: host: rescuehub.local
+    - http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: rescuehub-web
+                name: api-gateway
                 port:
                   number: 8000
