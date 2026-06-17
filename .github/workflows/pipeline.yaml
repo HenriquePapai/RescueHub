@@ -29,8 +29,7 @@ jobs:
       - name: Setup-Snyk
         uses: snyk/actions/setup@master
       - name: Snyk-Scan
-        continue-on-error: true
-        run: snyk code test --org=${{ secrets.SNYK_ORG }} --exclude=gateway/proxy/views.py
+        run: snyk code test --org=${{ secrets.SNYK_ORG }} -d
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
