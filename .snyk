@@ -1,6 +1,12 @@
-version: v1,2,3
+version: v1.25.0
+
 ignore:
   b35812fc-0f3f-4aff-b2fc-7420652579e9:
-    - '*'
+    - '*':
+        reason: "Aceito"
+        expires: 2099-12-31T23:59:59.999Z
+
   18e2a903-f5ab-4713-89d8-6566af81693e:
-    - '*'
+    - '*':
+        reason: "Aceito"
+        expires: 2099-12-31T23:59:59.999Z
