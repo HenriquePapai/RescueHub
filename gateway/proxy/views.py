@@ -196,6 +196,7 @@ def copy_response_cookies(backend_response, response):
                 samesite=morsel["samesite"] or None,
             )
 
+# deepcode ignore NoCSRF: O Gateway é apenas um proxy, a validação de CSRF ocorre no backend
 @csrf_exempt
 def proxy_to_backend(request, path=""):
     """
@@ -244,6 +245,7 @@ def proxy_to_backend(request, path=""):
             status=502,
         )
 
+    # deepcode ignore XSS: O conteúdo retornado vem do backend
     response = HttpResponse(
         content=backend_response.content,
         status=backend_response.status_code,
