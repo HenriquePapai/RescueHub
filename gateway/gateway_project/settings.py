@@ -52,7 +52,7 @@ WSGI_APPLICATION = 'gateway_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/tmp/rescuehub_gateway.sqlite3',
+        'NAME': BASE_DIR / 'rescuehub_gateway.sqlite3',
     }
 }
 
