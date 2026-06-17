@@ -1,0 +1,8 @@
+version: v1.25.0
+ignore:
+  SNYK-CC-DJANGO-CSRF:
+    - 'gateway/proxy/views.py':
+        reason: >
+          Proxy reverso transparente — o @csrf_exempt é intencional. A validação de CSRF
+          é responsabilidade do backend Django principal, não do gateway.
+        expires: '2027-12-31T00:00:00.000Z'

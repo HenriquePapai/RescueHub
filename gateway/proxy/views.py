@@ -247,12 +247,16 @@ def proxy_to_backend(request, path=""):
     response = HttpResponse(
         content=backend_response.content,
         status=backend_response.status_code,
+        content_type=backend_response.headers.get("Content-Type", "application/octet-stream"),
     )
 
     for header_name, header_value in backend_response.headers.items():
         header_lower = header_name.lower()
 
         if header_lower in RESPONSE_HEADERS_TO_SKIP:
+            continue
+
+        if header_lower == "content-type":
             continue
 
         if header_lower == "location":
