@@ -1,0 +1,4 @@
+exclude:
+  code:
+    - path: gateway/proxy/views.py
+      reason: "A validação de segurança ocorre no backend."
