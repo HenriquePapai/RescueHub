@@ -11,23 +11,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup-Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - name: Instalar Bandit
         run: pip install bandit
+
       - name: Execucao Bandit
         run: bandit -r .
-  
+
   snyk-sast:
     name: Snyk - SAST
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup-Snyk
         uses: snyk/actions/setup@master
+
       - name: Snyk-Scan
         run: snyk code test --org=${{ secrets.SNYK_ORG }}
         env:
@@ -39,6 +44,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup-Snyk
         uses: snyk/actions/python@0.4.0
         env:
@@ -47,18 +53,141 @@ jobs:
           command: test
           args: --file=requirements.txt --org=${{ secrets.SNYK_ORG }}
 
+  kubernetes:
+    name: Kubernetes - Kind, Pods Security e Secrets Encryption
+    needs: [bandit, snyk-sast, snyk-sca]
+    runs-on: ubuntu-latest
+
+    env:
+      CLUSTER_NAME: rescuehub
+      KIND_VERSION: v0.32.0
+      KUBECTL_VERSION: v1.36.1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar kubectl
+        run: |
+          curl -Lo kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+          kubectl version --client=true
+
+      - name: Instalar kind
+        run: |
+          curl -Lo kind "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64"
+          chmod +x kind
+          sudo mv kind /usr/local/bin/kind
+          kind version
+
+      - name: Garantir permissao dos scripts
+        run: |
+          chmod +x apply-local.sh || true
+          chmod +x scripts/create-secure-kind-cluster.sh || true
+          chmod +x scripts/check-secret-encryption.sh || true
+
+      - name: Criar cluster kind seguro
+        run: |
+          bash scripts/create-secure-kind-cluster.sh
+          kubectl get nodes
+
+      - name: Buildar imagem Django principal
+        run: |
+          docker build --no-cache -t rescuehub-web:local -f Dockerfile.k8s .
+
+      - name: Buildar imagem API Gateway
+        run: |
+          docker build --no-cache -t rescuehub-gateway:local -f Dockerfile.gateway.k8s .
+
+      - name: Carregar imagens no kind
+        run: |
+          kind load docker-image rescuehub-web:local --name "${CLUSTER_NAME}"
+          kind load docker-image rescuehub-gateway:local --name "${CLUSTER_NAME}"
+
+      - name: Aplicar manifests Kubernetes
+        run: |
+          bash apply-local.sh
+
+      - name: Validar Pods do namespace rescuehub
+        run: |
+          kubectl -n rescuehub get pods -o wide
+          kubectl -n rescuehub get svc
+          kubectl -n rescuehub get pvc
+
+          kubectl -n rescuehub wait --for=condition=Ready pod/postgres-0 --timeout=180s
+          kubectl -n rescuehub wait --for=condition=Ready pod -l app.kubernetes.io/name=rescuehub-web --timeout=180s
+          kubectl -n rescuehub wait --for=condition=Ready pod -l app.kubernetes.io/name=api-gateway --timeout=180s
+
+      - name: Testar API Gateway via port-forward
+        run: |
+          kubectl -n rescuehub port-forward service/api-gateway 8000:8000 > /tmp/rescuehub-port-forward.log 2>&1 &
+          PF_PID=$!
+
+          echo "Aguardando port-forward iniciar..."
+          sleep 8
+
+          echo "Testando healthcheck do API Gateway..."
+          curl --fail --retry 10 --retry-delay 3 http://127.0.0.1:8000/gateway/health/
+
+          echo "Testando home via API Gateway..."
+          curl --fail --retry 10 --retry-delay 3 -I http://127.0.0.1:8000/
+
+          echo "Testando CSS via API Gateway..."
+          curl --fail --retry 10 --retry-delay 3 -I http://127.0.0.1:8000/static/css/base.css
+
+          kill "${PF_PID}" || true
+
+      - name: Validar criptografia dos Kubernetes Secrets
+        run: |
+          bash scripts/check-secret-encryption.sh
+
+      - name: Coletar diagnostico Kubernetes
+        if: always()
+        run: |
+          mkdir -p k8s-debug
+
+          kubectl get nodes -o wide > k8s-debug/nodes.txt || true
+          kubectl get namespaces > k8s-debug/namespaces.txt || true
+          kubectl -n rescuehub get all -o wide > k8s-debug/rescuehub-all.txt || true
+          kubectl -n rescuehub get pods -o wide > k8s-debug/rescuehub-pods.txt || true
+          kubectl -n rescuehub describe pods > k8s-debug/rescuehub-pods-describe.txt || true
+          kubectl -n rescuehub get events --sort-by=.lastTimestamp > k8s-debug/rescuehub-events.txt || true
+
+          kubectl -n rescuehub logs deploy/api-gateway --all-containers=true > k8s-debug/api-gateway.log || true
+          kubectl -n rescuehub logs deploy/rescuehub-web --all-containers=true > k8s-debug/rescuehub-web.log || true
+          kubectl -n rescuehub logs statefulset/postgres --all-containers=true > k8s-debug/postgres.log || true
+          kubectl -n rescuehub logs job/django-migrate --all-containers=true > k8s-debug/django-migrate.log || true
+
+          cat /tmp/rescuehub-port-forward.log > k8s-debug/port-forward.log || true
+
+      - name: Upload diagnostico Kubernetes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rescuehub-k8s-debug-${{ github.run_number }}
+          path: k8s-debug/
+          retention-days: 7
+
+      - name: Remover cluster kind
+        if: always()
+        run: |
+          kind delete cluster --name "${CLUSTER_NAME}" || true
+
   delivery:
     name: Build-Push
-    needs: [bandit, snyk-sast, snyk-sca]
+    needs: [kubernetes]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Login no Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Envio para o Docker Hub
         uses: docker/build-push-action@v5
         with:
@@ -66,6 +195,7 @@ jobs:
           file: ./docker/web/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/rescue-hub:latest
+
       - name: Logout
         run: docker logout
 
