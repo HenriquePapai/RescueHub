@@ -44,9 +44,12 @@ scripts/restore_db.sh backups/rescuehub_YYYYMMDD_HHMMSS.sql.gz
 
 ---
 
-## 1 Criar cluster
+## 1 Criar e subir o cluster
 ```bash
-./scripts/create-secure-kind-cluster.sh
+chmod +x setup-rescuehub.sh
+```
+```bash
+./setup-rescuehub.sh
 ```
 # Verificar se a um node criado:
 ```bash
