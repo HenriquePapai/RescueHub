@@ -20,8 +20,8 @@ http://127.0.0.1:8000/
 ```
 docker exec -it rescuehub_web python app/manage.py createsuperuser
 ```
+---
 # Backup e Restauração
-
 ## Atualizar:
 ```bash
 chmod +x scripts/*.sh
@@ -32,7 +32,6 @@ sudo apt update
 ```bash
 sudo apt install -y postgresql-client
 ```
-
 ## 1. Backup manual:
 ```bash
 scripts/backup_db.sh
@@ -41,39 +40,30 @@ scripts/backup_db.sh
 ```bash
 scripts/restore_db.sh backups/rescuehub_YYYYMMDD_HHMMSS.sql.gz
 ```
-
 ---
-
-## 1 Criar e subir o cluster
+# Cluster Kubernetes
+## 1. Criar e subir o cluster
 ```bash
 chmod +x setup-rescuehub.sh
 ```
 ```bash
 ./setup-rescuehub.sh
 ```
-# Verificar se a um node criado:
+## 2. Verificar se há um node criado:
 ```bash
 kubectl get nodes
 ```
-
 ---
-
 # Criar superusuário no Kubernetes
-
-Depois que o Deployment estiver rodando:
-
+## 1. Depois que o Deployment estiver rodando:
 ```bash
 kubectl -n rescuehub get pods
 ```
-
-Pegue o nome do pod Django e rode:
-
+## 2. Pegue o nome do pod Django e rode:
 ```bash
 kubectl -n rescuehub exec -it deploy/rescuehub-web -- python app/manage.py createsuperuser
 ```
-
-Para listar usuários:
-
+## 3. Para listar usuários:
 ```bash
 kubectl -n rescuehub exec -it deploy/rescuehub-web -- python app/manage.py shell -c "from django.contrib.auth import get_user_model; User=get_user_model(); print(list(User.objects.values('id','username','is_superuser','role')))"
 ```
