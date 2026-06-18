@@ -29,10 +29,6 @@ scripts/backup_db.sh
 ```bash
 scripts/restore_db.sh backups/rescuehub_YYYYMMDD_HHMMSS.sql.gz
 ```
-## 3. Backup automático via pipeline:
-A cada push, o job Backup - PostgreSQL roda automaticamente após o delivery.
-Para acompanhar: GitHub → Actions → run mais recente → Artifacts.
-Para disparar manualmente: GitHub → Actions → Projeto → Run workflow.
 
 ---
 
