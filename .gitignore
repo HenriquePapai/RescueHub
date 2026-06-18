@@ -1,3 +1,44 @@
--e # Backups locais (gerados por scripts/backup_db.sh)
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Ambientes virtuais
+venv/
+.venv/
+
+# Django
+*.sqlite3
+app/media/*
+!app/media/.gitkeep
+app/staticfiles/
+
+# Env/secrets
+.env
+.env.*
+!.env.example
+
+# Backups locais (gerados por scripts/backup_db.sh)
 backups/
 *.sql.gz
+
+# Certificados/chaves
+*.pem
+*.key
+*.crt
+
+# Docker/Kubernetes local
+postgres_data/
+db_data/
+
+# Arquivos locais gerados para criptografia do cluster kind.
+# Não commitar a chave real de criptografia.
+.local/
+kind/generated/
+
+# IDE/SO
+.vscode/
+.idea/
+.DS_Store

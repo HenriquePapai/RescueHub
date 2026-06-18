@@ -26,6 +26,13 @@ spec:
         app.kubernetes.io/component: gateway
         app.kubernetes.io/part-of: rescuehub
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10002
+        runAsGroup: 10002
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: api-gateway
           image: rescuehub-gateway:local
@@ -48,23 +55,15 @@ spec:
                   name: rescuehub-secret
                   key: GATEWAY_SECRET_KEY
           readinessProbe:
-            httpGet:
-              path: /gateway/health/
+            tcpSocket:
               port: http
-              httpHeaders:
-                - name: Host
-                  value: localhost
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 3
             failureThreshold: 6
           livenessProbe:
-            httpGet:
-              path: /gateway/health/
+            tcpSocket:
               port: http
-              httpHeaders:
-                - name: Host
-                  value: localhost
             initialDelaySeconds: 30
             periodSeconds: 20
             timeoutSeconds: 3

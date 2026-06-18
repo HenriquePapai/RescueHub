@@ -26,8 +26,14 @@ spec:
         app.kubernetes.io/component: web
         app.kubernetes.io/part-of: rescuehub
     spec:
+      automountServiceAccountToken: false
       securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
         fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: django
           image: rescuehub-web:local

@@ -21,6 +21,10 @@ spec:
         app.kubernetes.io/component: database
         app.kubernetes.io/part-of: rescuehub
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: postgres
           image: postgres:16-alpine
@@ -71,6 +75,8 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
