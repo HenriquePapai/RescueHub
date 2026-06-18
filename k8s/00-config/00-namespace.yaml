@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rescuehub
+  labels:
+    app.kubernetes.io/name: rescuehub
+    app.kubernetes.io/part-of: rescuehub
+
+    # Política de segurança de Pods.
+    # O nível baseline é aplicado de fato.
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest
+
+    # O nível restricted gera avisos e auditoria,
+    # mas não bloqueia os Pods neste primeiro momento.
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: latest
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: latest

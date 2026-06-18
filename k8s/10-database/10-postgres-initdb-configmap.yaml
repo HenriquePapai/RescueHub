@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-initdb
+  namespace: rescuehub
+  labels:
+    app.kubernetes.io/name: postgres-initdb
+    app.kubernetes.io/part-of: rescuehub
+data:
+  init.sql: |
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

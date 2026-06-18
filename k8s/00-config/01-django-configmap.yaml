@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rescuehub-config
+  namespace: rescuehub
+data:
+  DEBUG: "1"
+
+  DATABASE_NAME: "rescuehub"
+  DATABASE_USER: "rescuehub"
+  DATABASE_HOST: "postgres"
+  DATABASE_PORT: "5432"
+
+  ALLOWED_HOSTS: "localhost,127.0.0.1,.localhost,.app.github.dev,rescuehub.local,rescuehub-web,api-gateway"
+
+  CSRF_TRUSTED_ORIGINS: "http://localhost:8000,https://localhost:8000,http://127.0.0.1:8000,https://127.0.0.1:8000,https://*.app.github.dev,http://rescuehub.local,https://rescuehub.local"
+
+  USE_X_FORWARDED_HOST: "1"
+  SECURE_PROXY_SSL_HEADER_ENABLED: "1"
