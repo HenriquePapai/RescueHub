@@ -25,7 +25,11 @@ docker exec -it rescuehub_web python app/manage.py createsuperuser
 ## Atualizar:
 ```bash
 chmod +x scripts/*.sh
+```
+```bash
 sudo apt update
+```
+```bash
 sudo apt install -y postgresql-client
 ```
 
@@ -41,23 +45,34 @@ scripts/restore_db.sh backups/rescuehub_YYYYMMDD_HHMMSS.sql.gz
 ---
 
 ## 1 Criar cluster
+```bash
 ./scripts/create-secure-kind-cluster.sh
-
+```
 # Verificar se a um node criado:
+```bash
 kubectl get nodes
-
+```
 ## 2 Buildar a imagem:
+```bash
 docker build -t rescuehub-web:local -f Dockerfile.k8s .
+```
+```bash
 docker build -t rescuehub-gateway:local -f Dockerfile.gateway.k8s .
-
+```
+```bash
 kind load docker-image rescuehub-web:local --name rescuehub
+```
+```bash
 kind load docker-image rescuehub-gateway:local --name rescuehub
-
+```
 ## 3 Rodar o apply
+```bash
 bash apply-local.sh
-
+```
 ## 4 Acessar
+```bash
 kubectl -n rescuehub port-forward service/api-gateway 8000:8000
+```
 
 ---
 
