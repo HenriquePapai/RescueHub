@@ -21,6 +21,14 @@ http://127.0.0.1:8000/
 docker exec -it rescuehub_web python app/manage.py createsuperuser
 ```
 # Backup e Restauração
+
+## Atualizar:
+```bash
+chmod +x scripts/*.sh
+sudo apt update
+sudo apt install -y postgresql-client
+```
+
 ## 1. Backup manual:
 ```bash
 scripts/backup_db.sh
