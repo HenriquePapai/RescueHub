@@ -3,6 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import User, Animal, AdoptionRequest, AuditLog
+from django.views.decorators.csrf import ensure_csrf_cookie
 import re
 
 
@@ -203,6 +204,7 @@ def gerenciar_adocoes(request):
 
 # Req 10: Aprovação e Log de Auditoria
 @login_required
+@ensure_csrf_cookie
 def avaliar_adocao(request, pk):
     if not request.user.can_manage_animals():
         return redirect('home')
